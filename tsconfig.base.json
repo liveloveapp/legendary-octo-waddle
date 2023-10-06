@@ -14,7 +14,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@courier-next/angular": ["packages/angular/src/index.ts"],
+      "@courier-next/react": ["packages/react/src/index.ts"],
+      "@courier-next/web": ["packages/web/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

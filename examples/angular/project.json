@@ -1,0 +1,84 @@
+{
+  "name": "examples-angular",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "courier",
+  "sourceRoot": "examples/angular/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/examples/angular",
+        "index": "examples/angular/src/index.html",
+        "main": "examples/angular/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "examples/angular/tsconfig.app.json",
+        "assets": [
+          "examples/angular/src/favicon.ico",
+          "examples/angular/src/assets"
+        ],
+        "styles": ["examples/angular/src/styles.css"],
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "examples/angular/webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@nx/angular:webpack-dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "examples-angular:build:production"
+        },
+        "development": {
+          "browserTarget": "examples-angular:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "examples-angular:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": [
+          "examples/angular/**/*.ts",
+          "examples/angular/**/*.html"
+        ]
+      }
+    }
+  }
+}
