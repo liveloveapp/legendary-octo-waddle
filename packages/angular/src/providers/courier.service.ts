@@ -1,11 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { COURIER_CONFIG } from './courier-config.injectable';
-import {
-  CourierSdk,
-  CourierMessage,
-  CourierMessageEvent,
-} from '@courier-next/web';
-import { Observable, fromEvent, map } from 'rxjs';
+import { CourierSdk, CourierMessage } from '@courier-next/web';
+import { Observable, Observer } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CourierService {
@@ -23,9 +19,21 @@ export class CourierService {
     this.sdk = new CourierSdk(config);
   }
 
-  listenForMessages(): Observable<CourierMessage> {
-    return fromEvent<CourierMessageEvent>(this.sdk, 'couriermessage').pipe(
-      map((event) => event.detail)
-    );
+  listenForMessages(config: {
+    userId: string;
+    tenantId?: string | null;
+  }): Observable<CourierMessage> {
+    return new Observable((observer: Observer<CourierMessage>) => {
+      const abortController = new AbortController();
+
+      this.sdk.listenToNotifications({
+        userId: config.userId,
+        tenantId: config.tenantId,
+        onMessage: (message) => observer.next(message),
+        signal: abortController.signal,
+      });
+
+      return () => abortController.abort();
+    });
   }
 }

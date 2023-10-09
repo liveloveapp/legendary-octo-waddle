@@ -6,3 +6,19 @@ export function defineElementOnce(
     customElements.define(elementSelector, elementCtor);
   }
 }
+
+export interface OnConnected {
+  connectedCallback(): void;
+}
+
+export interface OnDisconnected {
+  disconnectedCallback(): void;
+}
+
+export interface OnAttributeChanged {
+  attributeChangedCallback(
+    name: string,
+    oldValue: string,
+    newValue: string
+  ): void;
+}

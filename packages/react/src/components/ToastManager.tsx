@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  ToastCloseEvent,
   ToastManagerElement,
   ToastMessageElement,
   defineToastElements,
 } from '@courier-next/web';
 import { useCourier } from '../providers/CourierProvider';
+import { useElementEventNotifier, useElementPropBinding } from '../utils';
 
 export function ToastManager({
+  userId,
+  tenantId,
   toastDuration,
-  style,
   className,
   toastClassName,
+  onToastClose,
+  style,
   toastMessageElement,
 }: {
+  userId: string;
+  tenantId?: string;
   toastDuration?: number;
-  style?: React.CSSProperties;
   className?: string;
   toastClassName?: string;
+  onToastClose?: (event: ToastCloseEvent) => void;
+  style?: React.CSSProperties;
   toastMessageElement?: typeof ToastMessageElement;
 }) {
   const courier = useCourier();
@@ -24,9 +32,14 @@ export function ToastManager({
   const [toastManagerElement, setToastManagerElement] =
     useState<ToastManagerElement | null>(null);
 
-  useEffect(() => {
-    defineToastElements();
-  }, []);
+  useEffect(() => defineToastElements(), []);
+
+  useElementPropBinding(toastManagerElement, 'userId', userId);
+  useElementPropBinding(toastManagerElement, 'tenantId', tenantId);
+  useElementPropBinding(toastManagerElement, 'toastDuration', toastDuration);
+  useElementPropBinding(toastManagerElement, 'className', className);
+  useElementPropBinding(toastManagerElement, 'toastClassName', toastClassName);
+  useElementEventNotifier(toastManagerElement, 'toastclose', onToastClose);
 
   useEffect(() => {
     if (!div.current) return;
@@ -44,9 +57,6 @@ export function ToastManager({
   useEffect(() => {
     if (!toastManagerElement) return;
 
-    if (toastDuration !== undefined)
-      toastManagerElement.toastDuration = toastDuration;
-
     if (style !== undefined) {
       Object.keys(style).forEach((key) => {
         type StringObject = { [key: string]: string };
@@ -55,9 +65,7 @@ export function ToastManager({
         )[key];
       });
     }
-
-    if (className !== undefined) toastManagerElement.className = className;
-  }, [toastManagerElement, toastDuration, style, className, toastClassName]);
+  }, [toastManagerElement, style]);
 
   return <div ref={div} />;
 }

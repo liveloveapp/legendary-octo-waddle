@@ -6,9 +6,9 @@ export default function PreviousSdkDemo() {
     <div>
       <h2>Prevous SDK Demo</h2>
       <CourierProvider
-        tenantId={process.env.VITE_COURIER_TENANT_ID}
-        userId={process.env.VITE_COURIER_USER_ID}
-        clientKey={process.env.VITE_COURIER_CLIENT_KEY}
+        clientKey={import.meta.env.VITE_COURIER_CLIENT_KEY}
+        tenantId={import.meta.env.VITE_COURIER_TENANT_ID}
+        userId={import.meta.env.VITE_COURIER_USER_ID}
       >
         <Toast />
       </CourierProvider>

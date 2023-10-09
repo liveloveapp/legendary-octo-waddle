@@ -8,17 +8,16 @@ import {
   Output,
   inject,
   signal,
-  effect,
 } from '@angular/core';
-
 import {
   DEFAULT_TOAST_DURATION,
   ToastCloseEvent,
   ToastManagerElement,
   defineToastElements,
 } from '@courier-next/web';
-import { Subscription, fromEvent } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { CourierService } from '../providers/courier.service';
+import { bindEventsToOutputs, bindSignalsToProperties } from '../utils';
 
 /**
  * Intentionally using a directive instead of a component here
@@ -36,8 +35,10 @@ export class ToastManagerComponent implements AfterViewInit, OnDestroy {
   #elementRef = inject(ElementRef);
   #duration = signal(DEFAULT_TOAST_DURATION);
   #toastClassName = signal('');
+  #userId = signal<string | null>(null);
+  #tenantId = signal<string | null>(null);
+  #toastManager = signal<ToastManagerElement | null>(null);
   #subscriptions = new Subscription();
-  #toastManager: ToastManagerElement | undefined;
 
   @Input() set duration(duration: number) {
     this.#duration.set(duration);
@@ -47,21 +48,28 @@ export class ToastManagerComponent implements AfterViewInit, OnDestroy {
     this.#toastClassName.set(toastClassName);
   }
 
-  @Output() toastClose = new EventEmitter<string>();
+  @Input() set userId(userId: string | null) {
+    this.#userId.set(userId);
+  }
+
+  @Input() set tenantId(tenantId: string | null) {
+    this.#tenantId.set(tenantId);
+  }
+
+  @Output() toastClose = new EventEmitter<ToastCloseEvent>();
 
   constructor() {
     defineToastElements();
 
-    effect(() => {
-      if (this.#toastManager) {
-        this.#toastManager.toastDuration = this.#duration();
-      }
+    bindSignalsToProperties(this.#toastManager, {
+      toastDuration: this.#duration,
+      toastClassName: this.#toastClassName,
+      userId: this.#userId,
+      tenantId: this.#tenantId,
     });
 
-    effect(() => {
-      if (this.#toastManager) {
-        this.#toastManager.toastClassName = this.#toastClassName();
-      }
+    bindEventsToOutputs(this.#toastManager, {
+      toastclose: this.toastClose,
     });
   }
 
@@ -70,11 +78,7 @@ export class ToastManagerComponent implements AfterViewInit, OnDestroy {
 
     this.#elementRef.nativeElement.appendChild(toastManager);
 
-    this.#subscriptions.add(
-      fromEvent<ToastCloseEvent>(toastManager, 'toastclose').subscribe(
-        (event) => this.toastClose.emit(event.detail)
-      )
-    );
+    this.#toastManager.set(toastManager);
   }
 
   ngOnDestroy(): void {

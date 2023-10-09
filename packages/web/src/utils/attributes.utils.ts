@@ -32,3 +32,22 @@ export function coerceAttributeToInteger(
 
   return parsedValue;
 }
+
+/**
+ * Applies a value to an element's attribute
+ *
+ * @param element The element to apply the attribute to
+ * @param attribute Name of the attribute
+ * @param value Value to apply
+ */
+export function setAttributeValue(
+  element: HTMLElement,
+  attribute: string,
+  value: string | null
+) {
+  if (value) {
+    element.setAttribute(attribute, value);
+  } else {
+    element.removeAttribute(attribute);
+  }
+}

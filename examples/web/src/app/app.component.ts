@@ -27,12 +27,11 @@ export class AppComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.target.nativeElement.innerHTML = `
-        <courier-provider
-          tenant-id="${this.tenantId}"
-          user-id="${this.userId}"
-          client-key="${this.clientKey}"
-        >
-          <courier-toast-manager></courier-toast-manager>
+        <courier-provider client-key="${this.clientKey}">
+          <courier-toast-manager
+            tenant-id="${this.tenantId}"
+            user-id="${this.userId}">
+          </courier-toast-manager>
         </courier-provider>
       `;
   }

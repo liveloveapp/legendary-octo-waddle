@@ -1,5 +1,4 @@
-import { coerceAttributeToInteger } from '../../utils';
-import { defineElementOnce } from '../../utils/custom-elements.utils';
+import { coerceAttributeToInteger, defineElementOnce } from '../../utils';
 
 export const DEFAULT_TOAST_DURATION = 5_000;
 
@@ -61,6 +60,10 @@ export class ToastMessageElement extends HTMLElement {
 declare global {
   interface HTMLElementTagNameMap {
     'courier-toast-message': ToastMessageElement;
+  }
+
+  interface HTMLElementEventMap {
+    toastclose: ToastCloseEvent;
   }
 }
 

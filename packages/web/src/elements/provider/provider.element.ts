@@ -1,6 +1,18 @@
-import { CourierSdk } from '../../sdk';
+import { CourierSdk } from '../../api/sdk';
+import {
+  OnAttributeChanged,
+  OnConnected,
+  defineElementOnce,
+} from '../../utils';
 
-export class ProviderElement extends HTMLElement {
+export class ProviderElement
+  extends HTMLElement
+  implements OnConnected, OnAttributeChanged
+{
+  static get observedAttributes() {
+    return ['client-key'];
+  }
+
   #sdk: CourierSdk | undefined;
 
   get sdk() {
@@ -15,22 +27,24 @@ export class ProviderElement extends HTMLElement {
     super();
   }
 
-  connectedCallback() {
+  #createSdk() {
     const clientKey = this.getAttribute('client-key');
-    const tenantId = this.getAttribute('tenant-id');
-    const userId = this.getAttribute('user-id');
 
-    if (clientKey === null || tenantId === null || userId === null) {
-      throw new Error(
-        'Courier Provider element must be supplied with a client-key, tenant-id, and user-id'
-      );
+    if (!clientKey) {
+      this.#sdk = undefined;
+    } else {
+      this.#sdk = new CourierSdk({
+        clientKey,
+      });
     }
+  }
 
-    this.#sdk = new CourierSdk({
-      clientKey,
-      tenantId,
-      userId,
-    });
+  attributeChangedCallback(): void {
+    this.#createSdk();
+  }
+
+  connectedCallback(): void {
+    this.#createSdk();
   }
 }
 
@@ -55,5 +69,5 @@ export function getCourierSdkFromProviderElement(element: Node): CourierSdk {
 }
 
 export function defineProviderElement() {
-  customElements.define('courier-provider', ProviderElement);
+  defineElementOnce('courier-provider', ProviderElement);
 }

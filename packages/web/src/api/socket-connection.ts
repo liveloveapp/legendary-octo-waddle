@@ -2,7 +2,7 @@ export interface CourierSubscribePayload {
   action: 'subscribe';
   data: {
     // Tenant ID
-    accountId: string;
+    accountId?: string;
     // User ID
     channel: string;
     // Client Key
@@ -39,7 +39,7 @@ export function connectToCourierWebSocket({
   WebSocketCtor: typeof WebSocket;
   onMessage: (message: CourierMessage) => void;
   config: {
-    tenantId: string;
+    tenantId?: string;
     clientKey: string;
     clientSourceId: string;
     userId: string;
@@ -62,19 +62,19 @@ export function connectToCourierWebSocket({
         version: 5,
       },
     };
+
     socket.send(JSON.stringify(payload));
   });
 
   socket.addEventListener('message', (event) => {
     const message = JSON.parse(event.data);
+
     if (message.type === 'message') {
       onMessage(message);
     }
   });
 
   if (signal) {
-    signal.addEventListener('abort', () => {
-      socket.close();
-    });
+    signal.addEventListener('abort', () => socket.close());
   }
 }
