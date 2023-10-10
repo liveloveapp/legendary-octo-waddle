@@ -18,7 +18,6 @@ export class ToastManagerElement
   }
 
   #sdk?: CourierSdk;
-  #ToastMessageElementCtor: typeof ToastMessageElement;
   #abortController?: AbortController;
 
   get toastDuration() {
@@ -57,14 +56,10 @@ export class ToastManagerElement
     setAttributeValue(this, 'tenant-id', tenantId);
   }
 
-  constructor(
-    sdk?: CourierSdk,
-    toastMessageElement: typeof ToastMessageElement = ToastMessageElement
-  ) {
+  constructor(sdk?: CourierSdk) {
     super();
 
     this.#sdk = sdk;
-    this.#ToastMessageElementCtor = toastMessageElement;
   }
 
   #connectToMessages() {
@@ -101,7 +96,7 @@ export class ToastManagerElement
   }
 
   show(message: string) {
-    const toast = new this.#ToastMessageElementCtor();
+    const toast = new ToastMessageElement();
 
     toast.message = message;
 

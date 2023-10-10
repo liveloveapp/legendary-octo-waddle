@@ -26,23 +26,27 @@ export function bindSignalsToProperties<T extends object>(
     }
   });
 }
-// TODO: Get types from HTMLElementEventMap
-export function bindEventsToOutputs<T extends Event>(
+
+export function bindEventsToOutputs(
   element$: Signal<HTMLElement | null>,
-  eventToOutputDict: { [eventName: string]: EventEmitter<T> }
+  eventToOutputDict: Partial<{
+    [K in keyof HTMLElementEventMap]: EventEmitter<HTMLElementEventMap[K]>;
+  }>
 ) {
   const events$ = toObservable(element$).pipe(
     switchMap((element) => {
       if (!element) return EMPTY;
 
       return merge(
-        ...Object.keys(eventToOutputDict).map((eventName) =>
-          fromEvent<T>(element, eventName).pipe(
+        ...(
+          Object.keys(eventToOutputDict) as (keyof HTMLElementEventMap)[]
+        ).map((eventName) =>
+          fromEvent(element, eventName).pipe(
             tap((event) => {
               const output = eventToOutputDict[eventName];
 
               if (output) {
-                output.emit(event);
+                output.emit(event as never);
               }
             })
           )
@@ -54,4 +58,19 @@ export function bindEventsToOutputs<T extends Event>(
   const subscription = events$.subscribe();
 
   inject(DestroyRef).onDestroy(() => subscription.unsubscribe());
+}
+
+export function connectToCustomElement<T extends HTMLElement>({
+  element,
+  properties,
+  events,
+}: {
+  element: Signal<T | null>;
+  properties: Partial<Record<keyof T, Signal<T[keyof T]>>>;
+  events: Partial<{
+    [K in keyof HTMLElementEventMap]: EventEmitter<HTMLElementEventMap[K]>;
+  }>;
+}) {
+  bindSignalsToProperties(element, properties);
+  bindEventsToOutputs(element, events);
 }

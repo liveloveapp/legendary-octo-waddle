@@ -17,7 +17,7 @@ import {
 } from '@courier-next/web';
 import { Subscription } from 'rxjs';
 import { CourierService } from '../providers/courier.service';
-import { bindEventsToOutputs, bindSignalsToProperties } from '../utils';
+import { connectToCustomElement } from '../utils';
 
 /**
  * Intentionally using a directive instead of a component here
@@ -61,15 +61,17 @@ export class ToastManagerComponent implements AfterViewInit, OnDestroy {
   constructor() {
     defineToastElements();
 
-    bindSignalsToProperties(this.#toastManager, {
-      toastDuration: this.#duration,
-      toastClassName: this.#toastClassName,
-      userId: this.#userId,
-      tenantId: this.#tenantId,
-    });
-
-    bindEventsToOutputs(this.#toastManager, {
-      toastclose: this.toastClose,
+    connectToCustomElement({
+      element: this.#toastManager,
+      properties: {
+        toastDuration: this.#duration,
+        toastClassName: this.#toastClassName,
+        userId: this.#userId,
+        tenantId: this.#tenantId,
+      },
+      events: {
+        toastclose: this.toastClose,
+      },
     });
   }
 
