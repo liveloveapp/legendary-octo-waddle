@@ -2,7 +2,9 @@
   "name": "@courier/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "send-message": "node ./tools/scripts/send-message.mjs"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "~16.2.0",

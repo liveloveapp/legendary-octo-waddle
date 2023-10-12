@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import { CourierClient } from '@trycourier/courier';
-//'pk_prod_67YGJZ75A7MW4EPDCBBCAP0KJMEG'
+
 const courier = CourierClient({
   authorizationToken: process.env.COURIER_API_KEY,
 });
+
+const [, , message] = process.argv;
 
 async function main() {
   await courier.send({
@@ -13,7 +15,7 @@ async function main() {
         tenant_id: process.env.VITE_COURIER_TENANT_ID,
       },
       content: {
-        title: 'Hello World',
+        title: message ?? 'Hello World',
         body: '{{foo}}',
       },
       data: {
